@@ -1,1 +1,1 @@
-docker build --tag=jgoodier/nginx-plus-sshd .
+docker build --tag=docker-udf-workshop .

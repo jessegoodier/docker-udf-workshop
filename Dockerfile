@@ -3,7 +3,7 @@ FROM ubuntu:bionic
 LABEL maintainer="jesse.goodier@nginx.com"
 
 ## Install prerequisite packages, vim for editing, then Install NGINX Plus
-  && set -x \
+  RUN set -x \
   && apt-get update && apt-get upgrade -y \
   && apt-get install --no-install-recommends --no-install-suggests -y apt-transport-https ca-certificates gnupg1 curl python2.7 procps net-tools vim-tiny joe jq less git openssh-server openssh-client sudo \
   && ulimit -c -m -s -t unlimited 
@@ -26,11 +26,13 @@ RUN chmod 600 /home/workshop/.ssh/authorized_keys
 COPY id_rsa /home/workshop/.ssh/id_rsa
 RUN chmod 400 /home/workshop/.ssh/id_rsa
 RUN chown -R workshop:workshop /home/workshop/.ssh
+RUN git clone https://github.com/jessegoodier/NGINX-101-Workshop-UDF.git /home/ubuntu/udf
 RUN echo "workshop ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
 
 ##temporary test
 COPY nginx-repo.key /home/ubuntu
 COPY nginx-repo.crt /home/ubuntu
+RUN chown ubuntu:ubuntu /home/ubuntu/nginx-repo.*
 
 ##configure sshd
 RUN mkdir /var/run/sshd
@@ -48,6 +50,5 @@ RUN apt-get clean && \
 
 EXPOSE 22 80 443 8080
 STOPSIGNAL SIGTERM
-COPY sshd-nginx.sh sshd-nginx.sh
-CMD /bin/sh /sshd-nginx.sh
+CMD ["/usr/sbin/sshd", "-D"]
 
